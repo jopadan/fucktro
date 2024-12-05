@@ -1,3 +1,5 @@
+FuckTro by #N0NameN0
+------------------------------------------------------
 
 
     _
@@ -17,7 +19,7 @@
 				     FuckTro
 				     
 ------------------------------------------------------
-Code : AloneTrio a.k.a #N0NameN0
+Code : AloneTrio
 Graph : TLB & Kenet^PDX ( thanx for the idea ;)
 MUsix : Estrayk^PDX ( original composer Mad MAx)
 Mod routs : Adresd
