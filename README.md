@@ -1,5 +1,6 @@
-FuckTro by #N0NameN0
+FuckTro by [N0NameN0](https://github.com/N0NameN0)
 ------------------------------------------------------
+```sh
 
 
     _
@@ -77,13 +78,4 @@ And start to learn C, or try to code a little intro
 for the WAB DEMO ;)
 
 AloneTrio@wab.com
-
-
-
-
-
-
-
-
-
-
+```
