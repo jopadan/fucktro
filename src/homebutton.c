@@ -1,15 +1,16 @@
-int exit_callback(void)
+int exit_callback(int arg1, int arg2, void *common)
 {
 	sceKernelExitGame();
 	return 0;
 }
 
-void CallbackThread(void *arg)
+int CallbackThread(SceSize args, void *argp)
 {
 	int cbid;
 	cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
 	sceKernelRegisterExitCallback(cbid);
 	sceKernelSleepThreadCB();
+	return 0;
 }
 
 int SetupCallbacks(void)

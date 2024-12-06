@@ -69,7 +69,7 @@ static int VolumeTable[65][256];
 static void UpdateEffects();
 static void UpdateRow();
 static int MixChunk(int numsamples, short *buffer);
-static void ModPlayCallback(short *_buf, unsigned long length);
+static void ModPlayCallback(void *_buf, unsigned int length, void *arg);
 static int MixSubChunk(short * buffer, int numsamples);
 
 //////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ void ModPlay_Init(int channel,unsigned char *data)
 {
   modplayint_channel = channel;
   m_bPlaying = FALSE;
-  pspAudioSetChannelCallback(modplayint_channel,ModPlayCallback);
+  pspAudioSetChannelCallback(modplayint_channel,ModPlayCallback,data);
   ModPlay_Load("",data);
 }
 void ModPlay_FreeTune()
@@ -161,22 +161,21 @@ void ModPlay_FreeTune()
 void ModPlay_End()
 {
   ModPlay_Stop();
-  pspAudioSetChannelCallback(modplayint_channel,0);
+  pspAudioSetChannelCallback(modplayint_channel,0,NULL);
   ModPlay_FreeTune();
 }
 
-static void ModPlayCallback(short *_buf, unsigned long length)
+static void ModPlayCallback(void *_buf, unsigned int length, void *arg)
 {
-  if (m_bPlaying == TRUE) { //  Playing , so mix up a buffer
-    MixChunk(length,_buf);
+  if (m_bPlaying == TRUE)
+  { //  Playing , so mix up a buffer
+    MixChunk(length,(short*)_buf);
+    return;
   }
-  else { //  Not Playing , so clear buffer
-    {
-      int count;
-      for(count=0;count<length*2;count++)
-        *(_buf+count) = 0;
-    }
-  }
+   
+  //  Not Playing , so clear buffer
+  for(unsigned int count=0;count<length*2;count++)
+        *(((short*)_buf)+count) = 0;
 }
 
 
@@ -240,15 +239,15 @@ void ModPlay_Load(char *filename,unsigned char *data)
    m_Samples[i].nLength = ReadModWord(data, index);index+=2;
    m_Samples[i].nFineTune = (int)(unsigned char)*(data+index); index++;
    if (m_Samples[i].nFineTune > 7)
-     m_Samples[i].nFineTune -= 16;
-     m_Samples[i].nVolume = (int)(unsigned char)*(data+index); index++;
-     m_Samples[i].nLoopStart = ReadModWord(data, index);index+=2;
-     m_Samples[i].nLoopLength = ReadModWord(data, index);index+=2;
-     m_Samples[i].nLoopEnd = m_Samples[i].nLoopStart + m_Samples[i].nLoopLength;
+   	m_Samples[i].nFineTune -= 16;
+   m_Samples[i].nVolume = (int)(unsigned char)*(data+index); index++;
+   m_Samples[i].nLoopStart = ReadModWord(data, index);index+=2;
+   m_Samples[i].nLoopLength = ReadModWord(data, index);index+=2;
+   m_Samples[i].nLoopEnd = m_Samples[i].nLoopStart + m_Samples[i].nLoopLength;
 
-     // Fix loop end in case it goes too far
-     if (m_Samples[i].nLoopEnd > m_Samples[i].nLength)
-       m_Samples[i].nLoopEnd = m_Samples[i].nLength;
+   // Fix loop end in case it goes too far
+   if (m_Samples[i].nLoopEnd > m_Samples[i].nLength)
+	   m_Samples[i].nLoopEnd = m_Samples[i].nLength;
   }
 
   // Read in song data
@@ -723,7 +722,7 @@ static int MixSubChunk(short * buffer, int numsamples)
     short * mixed = ((track&3)==0)||((track&3)==3) ? left : right;
     
     //////////----- unsigned char ??
-    unsigned char * sample = &m_Samples[m_TrackDat[track].sample].data[0];
+    unsigned char * sample = (unsigned char*)&m_Samples[m_TrackDat[track].sample].data[0];
     int nLength = m_Samples[m_TrackDat[track].sample].nLength << FRAC_BITS;
     int nLoopLength = m_Samples[m_TrackDat[track].sample].nLoopLength << FRAC_BITS;
     int nLoopEnd = m_Samples[m_TrackDat[track].sample].nLoopEnd << FRAC_BITS;

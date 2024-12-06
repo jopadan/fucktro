@@ -15,11 +15,11 @@
 #include "modplayer.h"
 #include "modplayeri.h"
 
-#include "lib-gfx.c"
+#include "lib-gfx.hpp"
 
 #include "homebutton.c"
 
-#include "rire.c"
+#include "rire.hpp"
 #include "fucktro_logo.c"
 #include "ps2nfo_tcb.c"
 #include "boxe.c"
@@ -29,12 +29,12 @@
 #include "affiche.c"
 #include "wab_union.c"
 
-#include "mongolia.c"
+#include "mongolia.hpp"
 #include "level.c"
 #include "levelmask.c"
 #include "weareback.c"
 
-#include "font8x8.c"
+#include "font8x8.hpp"
 #include "scrolltxtintro.c"
 #include "sinscrintro.c"
 
@@ -43,7 +43,7 @@
 
 
 #define printf	pspDebugScreenPrintf
-PSP_MODULE_INFO("SDKTEST", 0, 1, 1);
+PSP_MODULE_INFO("WAB_FUCKTRO", 0, 1, 1);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
 
@@ -75,12 +75,12 @@ int main(int argc,char *argv[])
 	unsigned long sinscr=0,sinscrold=0;
 	unsigned long j;
 	unsigned long scrptr=0;
-	ctrl_data_t pad;
+	SceCtrlData pad;
 
 	SetupCallbacks();
 	
 	pspAudioInit();
-	ModPlay_Init(0,rire);
+	ModPlay_Init(0,rire.data());
 	
 	InitScreen();
 	ClearScreen(0);
@@ -128,7 +128,6 @@ int main(int argc,char *argv[])
 	PutSprite((479/2)-(xecuter_char_width/2),272-xecuter_char_high,xecuter_char_width,xecuter_char_high,0,xecuter_sprite);
     
     for(xx=-42;xx<=((479/2)-(xecuter_char_width/2)-40);xx+=0.008){
-		WaitVbl;
 		PutSprite(xx,272-robot_char_high,robot_char_width,robot_char_high,robotspr,robot_sprite);
 		robotspr+=0.008;
 		if(robotspr>7)
@@ -210,7 +209,7 @@ int main(int argc,char *argv[])
     fadetxt(24,"alonetrio at wab dot com");
     fadetxt(8,"let's go");
     
-    ModPlay_Init(0,mongolia);
+    ModPlay_Init(0,mongolia.data());
     ClearScreen(0);
     sceDisplaySetFrameBuf(vramtop+level_pos*2*512,512,1,1);
 
@@ -237,7 +236,7 @@ int main(int argc,char *argv[])
 		
 	    sceCtrlReadBufferPositive(&pad, 1);
     
-		if(pad.buttons & CTRL_RIGHT)
+		if(pad.Buttons & PSP_CTRL_RIGHT)
 		{
 			ofsetspr=1;
 		    spr=spr+0.2f;
@@ -246,7 +245,7 @@ int main(int argc,char *argv[])
 			if(sprx>448) sprx=448;
       	}
       	
-      	if(pad.buttons==CTRL_LEFT){
+      	if(pad.Buttons & PSP_CTRL_LEFT){
 			ofsetspr=8;
 			spr=spr+0.2f;
 			if(spr>7.0f) spr=1.0f;
@@ -255,7 +254,7 @@ int main(int argc,char *argv[])
 		}
 
 
-		if(pad.buttons==CTRL_UP){
+		if(pad.Buttons & PSP_CTRL_UP){
 		if((levelmask_img[(int)sprx+(level_pos+spry)*480+32*480+16]) != 0xffff){
 			ofsetspr=16;
 			spr=spr+0.2f;
@@ -265,7 +264,7 @@ int main(int argc,char *argv[])
 		}
 		}
 
-		if(pad.buttons==CTRL_DOWN){
+		if(pad.Buttons & PSP_CTRL_DOWN){
 		  if((levelmask_img[(int)sprx+(level_pos+spry)*480+33*480+16]) != 0xffff){
 			ofsetspr=16;
 			spr=spr+0.2f;
@@ -279,7 +278,7 @@ int main(int argc,char *argv[])
 		  }
 		}
 		
-		if(pad.buttons==0){
+		if(pad.Buttons==0){
 			spr=0;
 			ofsetspr=0;	
 			if((levelmask_img[(int)sprx+(level_pos+spry)*480+33*480+16]) != 0xffff){

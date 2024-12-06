@@ -1,4 +1,6 @@
-#include "font.c"
+#pragma once
+#include <pspdisplay.h>
+#include "font.hpp"
 
 #define RGB5( r, g, b )	( ( ( b ) << 10 ) + ( ( g ) << 5 ) + ( ( r ) << 0 ) + 0x8000 )
 #define R5( c )			( ( ( c ) >> 0 ) & 31 )
@@ -29,7 +31,7 @@ void ClearScreen(unsigned long color)
 	unsigned char *vptr0;		//pointer to vram
 	unsigned long i;
 
-	vptr0=GetVramAddr(0,0);
+	vptr0=(unsigned char*)GetVramAddr(0,0);
 	for (i=0; i<0x44000/2; i++) {
 		*(unsigned short *)vptr0=color;
 		vptr0+=2;
@@ -47,7 +49,7 @@ void PutPixel(long x, long y, unsigned short color)
     if(y<0)
       y=0;
       
-	vptr=GetVramAddr(x,y);
+	vptr=(unsigned char*)GetVramAddr(x,y);
 	*(unsigned short *)vptr=color;
 }
 //-------------------------------------------------------------------------------------------------
@@ -88,7 +90,7 @@ void PutGfxNoFade(unsigned long x,unsigned long y,unsigned long w,unsigned long 
 		y=136-(h/2);
 	}
 	
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char*)GetVramAddr(x,y);
 	for (yy=0; yy<h; yy++) {
 		vptr=vptr0;
 		dd=d;
@@ -120,7 +122,7 @@ void PutGfx(unsigned long x,unsigned long y,unsigned long w,unsigned long h,cons
 		y=136-(h/2);
 	}
 	
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char*)GetVramAddr(x,y);
 	for (yy=0; yy<h; yy++) {
 		vptr=vptr0;
 		dd=d;
@@ -152,7 +154,7 @@ void PutGfxTrans(unsigned long transcol, unsigned long x,unsigned long y,unsigne
 		y=136-(h/2);
 	}
 	
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char*)GetVramAddr(x,y);
 	for (yy=0; yy<h; yy++) {
 		vptr=vptr0;
 		dd=d;
@@ -212,7 +214,7 @@ void Putbg(unsigned long x,unsigned long y,unsigned long w,unsigned long h,unsig
 	unsigned long xx,yy,mx,my;
 	const unsigned short *dd;
 	
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char*)GetVramAddr(x,y);
 	for (yy=0; yy<h; yy++) {
 		for (my=0; my<mag; my++) {
 			vptr=vptr0;
@@ -237,7 +239,7 @@ void Rectangle(unsigned long x,unsigned long y,unsigned long w,unsigned long h,u
 	unsigned char *vptr;		//pointer to vram
 	unsigned long xx,yy;
 	
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char *)GetVramAddr(x,y);
 	for (yy=0; yy<h; yy++) {
 		vptr=vptr0;
 		for (xx=0; xx<w; xx++) {
@@ -257,20 +259,6 @@ void PauseVbl(unsigned int tempo){
     }
 }
 //**-------------------
-void pgPrint(unsigned long x,unsigned long y,unsigned long color,const char *str,unsigned fadefrom, int fadevalue)
-{
-	while (*str!=0 && x<60 && y<38) {
-		pgPutChar(x*8,y*8,color,0,*str,1,0,1,fadefrom,fadevalue);
-		str++;
-		x++;
-		if (x>=60) {
-			x=0;
-			y++;
-		}
-	}
-}
-
-
 void pgPutChar(unsigned long x,unsigned long y,unsigned long color,unsigned long bgcolor,unsigned char ch,char drawfg,char drawbg,char mag,unsigned fadefrom, int fadevalue)
 {
 	unsigned char *vptr0;		//pointer to vram
@@ -282,7 +270,7 @@ void pgPutChar(unsigned long x,unsigned long y,unsigned long color,unsigned long
 
 	if (ch>255) return;
 	cfont=font+ch*8;
-	vptr0=GetVramAddr(x,y);
+	vptr0=(unsigned char *)GetVramAddr(x,y);
 	for (cy=0; cy<8; cy++) {
 		for (my=0; my<mag; my++) {
 			vptr=vptr0;
@@ -303,3 +291,16 @@ void pgPutChar(unsigned long x,unsigned long y,unsigned long color,unsigned long
 		cfont++;
 	}
 }
+void pgPrint(unsigned long x,unsigned long y,unsigned long color,const char *str,unsigned fadefrom, int fadevalue)
+{
+	while (*str!=0 && x<60 && y<38) {
+		pgPutChar(x*8,y*8,color,0,*str,1,0,1,fadefrom,fadevalue);
+		str++;
+		x++;
+		if (x>=60) {
+			x=0;
+			y++;
+		}
+	}
+}
+
