@@ -4,9 +4,10 @@
 *.lo
 *.lib
 *.dll
+*.bat
 src/*.o
 src/*.a
 src/*.lo
 src/*.lib
 src/*.dll
-
+src/*.bat
